@@ -1,0 +1,40 @@
+name: BTC Signal Check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes (GitHub's minimum interval)
+  workflow_dispatch: {}       # lets you also trigger it manually from the Actions tab
+
+permissions:
+  contents: write   # needed so the workflow can commit the alerted_signals.json file back
+
+jobs:
+  check-signal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pandas requests
+
+      - name: Run signal check
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          CAPITAL_INR: ${{ secrets.CAPITAL_INR }}
+          RISK_PERCENT: ${{ secrets.RISK_PERCENT }}
+        run: python btc_signal_bot_cloud.py
+
+      - name: Commit updated alerted-signals log (if changed)
+        run: |
+          git config user.name "signal-bot"
+          git config user.email "signal-bot@users.noreply.github.com"
+          git add alerted_signals.json
+          git diff --cached --quiet || git commit -m "Update alerted signals log"
+          git push
