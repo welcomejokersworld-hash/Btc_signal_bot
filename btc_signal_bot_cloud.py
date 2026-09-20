@@ -50,7 +50,7 @@ LOOKBACK_DAYS = 15
 FRESH_SIGNAL_WINDOW_MINUTES = 20   # tolerate some scheduling delay from GitHub Actions
 ALERTED_LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "alerted_signals.json")
 
-BINANCE_BASE = "https://api.binance.com/api/v3/klines"
+BINANCE_BASE = "https://data-api.binance.vision/api/v3/klines"
 TELEGRAM_BASE = "https://api.telegram.org/bot{token}/sendMessage"
 
 
